@@ -1,9 +1,12 @@
 {
   "name": "polynode-composer",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Polynode: composer",
   "main": "build/index.js",
   "scripts": {
+    "build": "babel src/ -d build/",
+    "flow-typed-install": "flow-typed install",
+    "prepublish": "npm run build",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
