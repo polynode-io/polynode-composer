@@ -1,7 +1,7 @@
 {
   "name": "polynode-composer",
-  "version": "0.0.1",
-  "description": "Polynode: default log service",
+  "version": "0.0.2",
+  "description": "Polynode: composer",
   "main": "build/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
@@ -13,7 +13,8 @@
   "author": "Jorge Duarte Rodriguez <info@malagadev.com>",
   "license": "MIT",
   "dependencies": {
-    "awilix": "^4.3.3"
+    "awilix": "^4.3.3",
+    "polynode-service-log-default": "0.0.1"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.0",
