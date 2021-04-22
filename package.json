@@ -1,6 +1,6 @@
 {
   "name": "polynode-composer",
-  "version": "0.0.3",
+  "version": "0.0.4",
   "description": "Polynode: composer",
   "main": "build/index.js",
   "scripts": {
@@ -17,7 +17,7 @@
   "license": "MIT",
   "dependencies": {
     "awilix": "^4.3.3",
-    "polynode-service-log-default": "0.0.1"
+    "polynode-service-log-default": "0.0.2"
   },
   "devDependencies": {
     "@babel/cli": "^7.6.0",
