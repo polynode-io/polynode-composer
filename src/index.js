@@ -26,20 +26,22 @@
  *
  */
 
-const injector = require('awilix');
+const injector = require("awilix");
 
-const LogService = require('polynode-service-log-default');
+const LogService = require("polynode-service-log-default");
 
-const DEFAULT_DEPENDENCIES = { log: injector => injector.asFunction(LogService).singleton() };
+const DEFAULT_DEPENDENCIES = {
+  log: (injector) => injector.asFunction(LogService).singleton(),
+};
 
-const injectDefaultDeps = composer => {
-  console.log('[polynode/composer] Injecting default deps...');
+const injectDefaultDeps = (composer) => {
+  console.log("[polynode/composer] Injecting default deps...");
+
   for (const depName of Object.keys(DEFAULT_DEPENDENCIES)) {
-    console.log('[polynode/composer] - ' + depName + ' ...');
+    console.log("[polynode/composer] - " + depName + " ...");
     const depInjectorMethod = DEFAULT_DEPENDENCIES[depName];
-
     composer.integrate({
-      injector: composer =>
+      injector: (composer) =>
         composer.registerDependency({
           [depName]: depInjectorMethod,
         }),
@@ -57,11 +59,12 @@ const PolynodeComposer = function() {
   this.startHandlers = [];
 
   this.create = function(
-    firstModule: ComposerModule = null,
-    omitDefaultDeps: boolean = false,
+    firstModule?: ComposerModule = null,
+    omitDefaultDeps?: boolean = false,
     opts?: { inject?: {} } = {}
   ) {
     this.container = injector.createContainer();
+
     if (!omitDefaultDeps) {
       injectDefaultDeps(this);
     }
@@ -69,20 +72,31 @@ const PolynodeComposer = function() {
     if (firstModule) {
       return this.integrate(firstModule, opts);
     }
+
     return this;
   };
 
-  this.integrate = function(cModule: ComposerModule, opts?: { inject?: {} } = {}) {
-    console.log('[PolynodeComposer] integrate() - Module is: ', cModule, 'opts: ', opts);
+  this.integrate = function(
+    cModule: ComposerModule,
+    opts?: { inject?: {} } = {}
+  ) {
+    console.log(
+      "[PolynodeComposer] integrate() - Module is: ",
+      cModule,
+      "opts: ",
+      opts
+    );
     const instance = cModule.injector(this, opts);
-    if ('onStart' in cModule) {
+
+    if ("onStart" in cModule) {
       instance.startHandlers.push(() => cModule.onStart(instance));
     }
+
     return instance;
   };
 
   this.registerDependency = function(deps: {}) {
-    console.log('[PolynodeComposer] registerDependency() - Deps are: ', deps);
+    console.log("[PolynodeComposer] registerDependency() - Deps are: ", deps);
     this.container.register(
       Object.keys(deps).reduce((res, depName) => {
         const depObj = deps[depName](injector);
@@ -93,10 +107,35 @@ const PolynodeComposer = function() {
   };
 
   this.exec = function() {
-    return this.startHandlers.map(handler => handler());
+    return this.startHandlers.map((handler) => handler());
   };
 
-  return this.create();
+  this.addStartHandler = function(depStartHandlers) {
+    console.log("addstarthandler called");
+    Object.keys(depStartHandlers).forEach((depName) => {
+      console.log("[addStardHandler] Depname: ", depName);
+      const depStartHandler = depStartHandlers[depName];
+
+      this.startHandlers.push(() => {
+        const dependency = this.container.resolve(depName);
+        depStartHandler({ dependency });
+      });
+    });
+    return this;
+  };
+
+  this.log = function(...args) {
+    try {
+      this.container.resolve("log").trace(...args);
+    } catch (err) {
+      console.log(...args);
+    }
+  };
+
+  return this;
 };
 
-module.exports = PolynodeComposer();
+module.exports = () => {
+  const obj = new PolynodeComposer();
+  return obj;
+};
